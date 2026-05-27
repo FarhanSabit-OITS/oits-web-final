@@ -1,0 +1,310 @@
+import React, { useState, useEffect, useMemo } from 'react';
+import { AnimatePresence, motion } from 'motion/react';
+import { Globe, Smartphone, Users, Cloud, ArrowUpRight, X, Check, BookOpen, Layers, Star, Code, Cpu, Shield, Zap } from 'lucide-react';
+import { SERVICES } from '../constants';
+import { SectionId, Service } from '../types';
+import { Button } from './ui/Button';
+import { Link } from 'react-router-dom';
+import { Tooltip } from './ui/Tooltip';
+import { ScrollReveal } from './ui/ScrollReveal';
+import { AnimateScroll } from './ui/AnimateScroll';
+
+const iconMap: Record<string, React.ReactNode> = {
+  Globe: <Globe className="w-7 h-7" />,
+  Smartphone: <Smartphone className="w-7 h-7" />,
+  Users: <Users className="w-7 h-7" />,
+  Cloud: <Cloud className="w-7 h-7" />,
+  Layers: <Layers className="w-7 h-7" />,
+};
+
+const featureIconMap: Record<string, React.ReactNode> = {
+  'Workflow Automation Engines': <Zap size={16} />,
+  'Legacy Core Migration': <Code size={16} />,
+  'SaaS Multi-tenant Control': <Cloud size={16} />,
+  'Enterprise Risk Mitigations': <Shield size={16} />,
+  'React & Next.js Core Optimization': <Code size={16} />,
+  'Cloud-Native SaaS Architecture': <Cloud size={16} />,
+  'High-Conversion E-commerce': <Smartphone size={16} />,
+  'Headless CMS & API Orchestration': <Layers size={16} />,
+  'Swift & Kotlin Architecture': <Smartphone size={16} />,
+  'React Native & Flutter Mastery': <Smartphone size={16} />,
+  'Offline-First Functionality': <Zap size={16} />,
+  'Sensors & Device API Integration': <Cpu size={16} />,
+  'Serverless & Microservices': <Cloud size={16} />,
+  'Kubernetes Cluster Management': <Layers size={16} />,
+  'Automated CI/CD Pipelines': <Code size={16} />,
+  'Automated Database Backups': <Shield size={16} />,
+  'Precision Wireframing & Pairing': <Layers size={16} />,
+  'Conversion Funnel Optimizations': <Zap size={16} />,
+  'Dynamic Interaction Prototyping': <Smartphone size={16} />,
+  'Universal Accessibility Compliance': <Users size={16} />,
+  'AI/ML Predictive Analytics': <Cpu size={16} />,
+  'Immersive AR/VR Apps': <Layers size={16} />,
+  'Blockchain & Web-3 (DApps)': <Shield size={16} />,
+  'IoT & Edge Computing': <Cpu size={16} />,
+  'Progressive Web App (PWA)': <Globe size={16} />,
+  'React Native Frameworks': <Smartphone size={16} />,
+  'Flutter Application Development': <Smartphone size={16} />,
+  'Unified OS Experience': <Layers size={16} />,
+  'Expert Staff Augmentation': <Users size={16} />,
+  'Agile Project Management': <Users size={16} />,
+  'Full-stack Technical Leads': <Users size={16} />,
+  'Seamless Team Integration': <Users size={16} />,
+};
+
+interface ServicesProps {
+  limit?: number;
+}
+
+const ServiceSkeleton: React.FC = () => (
+  <div className="group relative bg-slate-50 dark:bg-slate-800/20 border-2 border-slate-50/50 dark:border-slate-800/50 rounded-[2.5rem] p-10 select-none animate-pulse">
+    {/* Icon block skeleton */}
+    <div className="w-16 h-16 bg-slate-200 dark:bg-slate-700/80 rounded-2xl mb-10" />
+    
+    {/* Title skeleton */}
+    <div className="h-7 w-3/4 bg-slate-200 dark:bg-slate-700/80 rounded-lg mb-4" />
+    
+    {/* Description lines skeleton */}
+    <div className="space-y-2 mb-8">
+      <div className="h-4 bg-slate-100 dark:bg-slate-700/65 rounded w-full" />
+      <div className="h-4 bg-slate-100 dark:bg-slate-700/65 rounded w-5/6" />
+      <div className="h-4 bg-slate-100 dark:bg-slate-700/65 rounded w-4/5" />
+    </div>
+
+    {/* Key Tech Title */}
+    <div className="h-3 w-1/3 bg-slate-100 dark:bg-slate-800 rounded mb-4" />
+
+    {/* Key Tech items skeleton */}
+    <div className="space-y-3 mb-10">
+      <div className="flex items-center gap-3">
+        <div className="w-3.5 h-3.5 bg-slate-200 dark:bg-slate-700 rounded-full shrink-0" />
+        <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-1/2" />
+      </div>
+      <div className="flex items-center gap-3">
+        <div className="w-3.5 h-3.5 bg-slate-200 dark:bg-slate-700 rounded-full shrink-0" />
+        <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-2/3" />
+      </div>
+      <div className="flex items-center gap-3">
+        <div className="w-3.5 h-3.5 bg-slate-200 dark:bg-slate-700 rounded-full shrink-0" />
+        <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-5/12" />
+      </div>
+    </div>
+
+    {/* Divider and button skeleton */}
+    <div className="space-y-6">
+      <div className="h-px w-full bg-slate-200/55 dark:bg-slate-700/35" />
+      <div className="h-4 w-1/3 bg-slate-200 dark:bg-slate-700 rounded-md" />
+    </div>
+  </div>
+);
+
+export const Services: React.FC<ServicesProps> = ({ limit }) => {
+  const [selectedService, setSelectedService] = useState<Service | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [activeCategory, setActiveCategory] = useState('All');
+
+  const categories = useMemo(() => ['All', ...Array.from(new Set(SERVICES.map(s => s.category || 'Other')))], []);
+  const filteredServices = useMemo(() => activeCategory === 'All' ? SERVICES : SERVICES.filter(s => (s.category || 'Other') === activeCategory), [activeCategory]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 550);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const displayServices = limit ? SERVICES.slice(0, limit) : SERVICES;
+
+  return (
+    <section id={SectionId.SERVICES} className="py-24 md:py-32 bg-white dark:bg-slate-900 relative transition-colors duration-300">
+      <div className="container mx-auto px-6">
+        
+        <AnimateScroll className="flex flex-col md:flex-row justify-between items-start md:items-end mb-20 gap-8">
+          <div className="max-w-2xl">
+            <h2 className="text-sm font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-4">Engineering Capabilities</h2>
+            <h3 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white leading-[1] tracking-tight">
+              Future-proof solutions <br className="hidden lg:block" /> for digital innovators.
+            </h3>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {categories.map((cat) => (
+              <button 
+                key={cat} 
+                onClick={() => setActiveCategory(cat)}
+                className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${activeCategory === cat ? 'bg-blue-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+
+        </AnimateScroll>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-8 md:gap-10">
+          <AnimatePresence mode="popLayout">
+            {isLoading 
+              ? Array.from({ length: 4 }).map((_, index) => (
+                  <ServiceSkeleton key={`skeleton-${index}`} />
+                ))
+              : filteredServices.map((service, index) => (
+                  <motion.div
+                    key={service.id}
+                    layout
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                  <ScrollReveal 
+                    key={service.id} 
+                    id={service.id}
+                    delay={index * 0.1}
+                    className={`group relative bg-slate-50 dark:bg-slate-800/40 border-2 border-slate-50 dark:border-slate-800 rounded-[2.5rem] p-10 transition-all duration-700 ease-out hover:-translate-y-3 hover:shadow-2xl hover:shadow-blue-500/5 hover:border-blue-400/30 cursor-pointer outline-none focus-visible:ring-4 focus-visible:ring-blue-500/20 scroll-mt-32`}
+                    onClick={() => setSelectedService(service)}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Service: ${service.title}. Click for details.`}
+                    aria-describedby={`service-desc-${service.id}`}
+                    aria-expanded={selectedService?.id === service.id}
+                    onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setSelectedService(service)}
+                  >
+                    {/* Icon with hover bounce animation for interactive feedback */}
+                    <div className="w-16 h-16 shrink-0 bg-white dark:bg-slate-700 rounded-2xl flex items-center justify-center text-slate-900 dark:text-white shadow-sm mb-10 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300 group-hover:animate-smooth-bounce border border-slate-100 dark:border-slate-600">
+                      {iconMap[service.icon]}
+                    </div>
+
+                    <h4 className="text-2xl font-black text-slate-900 dark:text-white mb-4 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors tracking-tight">{service.title}</h4>
+                    <Tooltip content={service.description} position="top">
+                      <p id={`service-desc-${service.id}`} className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-8 line-clamp-4 font-medium h-[80px]">
+                        {service.description}
+                      </p>
+                    </Tooltip>
+
+                    {/* Technologies/Benefits highlights directly in the card */}
+                    <div className="space-y-3 mb-10">
+                      <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2">Key Tech & Benefits</p>
+                      {service.features.slice(0, 3).map((feature, idx) => (
+                        <div key={idx} className="flex items-center gap-3 text-xs font-bold text-slate-500 dark:text-slate-400">
+                          <Check size={14} className="text-blue-600 dark:text-blue-400 shrink-0" />
+                          <span className="tracking-tight">{feature}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="space-y-6">
+                      <div className="h-px w-full bg-slate-200 dark:bg-slate-700/50" />
+                      {/* Learn More button with scale-up and icon translation on hover */}
+                      <button 
+                        className="group/btn flex items-center gap-2 text-xs font-black text-slate-900 dark:text-white uppercase tracking-[0.2em] transition-all duration-300 hover:scale-105 active:scale-95"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedService(service);
+                        }}
+                        aria-label={`Learn more about ${service.title}`}
+                      >
+                        Learn More 
+                        <ArrowUpRight 
+                          size={16} 
+                          className="transition-transform duration-300 group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 group-hover/btn:scale-110 text-blue-600 dark:text-blue-400" 
+                        />
+                      </button>
+                    </div>
+                  </ScrollReveal>
+                  </motion.div>
+                ))}
+          </AnimatePresence>
+        </div>
+      </div>
+
+      {/* Expanded Modal for Service Details */}
+      {selectedService && (
+        <div 
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-300" 
+          role="dialog" 
+          aria-modal="true"
+          aria-labelledby="modal-title"
+        >
+          <div className="w-full max-w-3xl bg-white dark:bg-slate-900 rounded-[3rem] shadow-2xl overflow-hidden border-2 border-slate-50 dark:border-slate-800 animate-in zoom-in-95 duration-300 max-h-[90vh] flex flex-col">
+            <div className="p-6 sm:p-10 md:p-16 relative overflow-y-auto">
+              <button 
+                onClick={() => setSelectedService(null)} 
+                className="absolute top-6 right-6 sm:top-10 sm:right-10 p-3 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-500 focus-visible:ring-4 focus-visible:ring-blue-500/20" 
+                aria-label="Close details"
+              >
+                <X size={28} />
+              </button>
+              
+              <div className="flex flex-col md:flex-row gap-10 items-start md:items-center mb-12">
+                <div className="w-20 h-20 bg-blue-100 dark:bg-blue-900/30 rounded-3xl flex items-center justify-center text-blue-600 dark:text-blue-400 shadow-inner">
+                  {iconMap[selectedService.icon]}
+                </div>
+                <div>
+                  <h3 id="modal-title" className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter mb-2">{selectedService.title}</h3>
+                  <div className="flex gap-2">
+                    <span className="px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-full text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Enterprise Ready</span>
+                    <span className="px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-full text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Agile Delivery</span>
+                  </div>
+                </div>
+              </div>
+
+              <p className="text-slate-600 dark:text-slate-400 text-xl mb-12 leading-relaxed font-semibold">{selectedService.description}</p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                <div>
+                  <h4 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-4">Focus Areas & Tech</h4>
+                  <div className="space-y-4">
+                    {selectedService.features.map((feature, idx) => (
+                      <div key={idx} className="flex items-center gap-4 p-4.5 bg-slate-50 dark:bg-slate-800/20 rounded-2xl border border-slate-100 dark:border-slate-800/50 transition-all hover:border-blue-500/20 group/item">
+                        <div className="w-9 h-9 rounded-xl bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center text-blue-600 dark:text-blue-400 shadow-sm shrink-0 transition-transform group-hover/item:scale-105">
+                          {featureIconMap[feature] || <Check size={16} />}
+                        </div>
+                        <span className="text-sm font-bold text-slate-700 dark:text-slate-200 tracking-tight">{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {selectedService.benefits && (
+                  <div>
+                    <h4 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-4">Strategic Advantages</h4>
+                    <div className="space-y-4">
+                      {selectedService.benefits.map((benefit, idx) => (
+                        <div key={idx} className="flex items-center gap-4 p-4.5 bg-indigo-50/20 dark:bg-indigo-900/10 rounded-2xl border border-indigo-100/10 dark:border-indigo-800/15 transition-all hover:border-indigo-500/20 group/benefit">
+                          <div className="w-9 h-9 rounded-xl bg-indigo-100/40 dark:bg-indigo-900/35 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
+                            <Star size={14} className="fill-indigo-500/10" />
+                          </div>
+                          <span className="text-sm font-bold text-slate-700 dark:text-slate-200 tracking-tight">{benefit}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {selectedService.caseStudyPlaceholder && (
+                <div className="mb-12 p-6.5 rounded-3xl bg-blue-50/30 dark:bg-slate-950/60 border border-blue-100/20 dark:border-slate-800/80">
+                  <h4 className="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-3">Successful Delivery Case Testimonial</h4>
+                  <p className="text-slate-700 dark:text-slate-350 text-sm italic font-semibold leading-relaxed">
+                    {selectedService.caseStudyPlaceholder}
+                  </p>
+                </div>
+              )}
+              
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Link to="/contact" className="flex-1" onClick={() => setSelectedService(null)}>
+                  <Button variant="primary" className="w-full py-8 text-lg rounded-2xl shadow-xl shadow-blue-600/20">Start Your Roadmap</Button>
+                </Link>
+                <button 
+                  onClick={() => setSelectedService(null)} 
+                  className="flex items-center justify-center gap-2 px-8 py-4 text-sm font-bold text-slate-500 hover:text-blue-600 dark:hover:text-white transition-colors"
+                >
+                  <BookOpen size={18} /> Documentation
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </section>
+  );
+};
