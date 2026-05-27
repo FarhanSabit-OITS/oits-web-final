@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp"],
+      "description": "Automates live framework discovery to ground the agent against official documentation for React 19, NestJS, GraphQL, and TanStack Query v5."
+    },
+    "semgrep-guardian": {
+      "command": "uvx",
+      "args": ["semgrep-mcp"],
+      "description": "Runs localized static security audits, automated after-file-edit checks, and credential leak scans."
+    },
+    "nx-monorepo-docs": {
+      "command": "npx",
+      "args": ["-y", "nx-docs-mcp"],
+      "description": "Provides the agent with structural monorepo awareness, preventing hallucinated project dependency commands."
+    }
+  }
+}
